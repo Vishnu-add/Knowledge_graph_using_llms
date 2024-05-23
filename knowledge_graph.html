@@ -1,0 +1,574 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script>function neighbourhoodHighlight(params) {
+  // console.log("in nieghbourhoodhighlight");
+  allNodes = nodes.get({ returnType: "Object" });
+  // originalNodes = JSON.parse(JSON.stringify(allNodes));
+  // if something is selected:
+  if (params.nodes.length > 0) {
+    highlightActive = true;
+    var i, j;
+    var selectedNode = params.nodes[0];
+    var degrees = 2;
+
+    // mark all nodes as hard to read.
+    for (let nodeId in allNodes) {
+      // nodeColors[nodeId] = allNodes[nodeId].color;
+      allNodes[nodeId].color = "rgba(200,200,200,0.5)";
+      if (allNodes[nodeId].hiddenLabel === undefined) {
+        allNodes[nodeId].hiddenLabel = allNodes[nodeId].label;
+        allNodes[nodeId].label = undefined;
+      }
+    }
+    var connectedNodes = network.getConnectedNodes(selectedNode);
+    var allConnectedNodes = [];
+
+    // get the second degree nodes
+    for (i = 1; i < degrees; i++) {
+      for (j = 0; j < connectedNodes.length; j++) {
+        allConnectedNodes = allConnectedNodes.concat(
+          network.getConnectedNodes(connectedNodes[j])
+        );
+      }
+    }
+
+    // all second degree nodes get a different color and their label back
+    for (i = 0; i < allConnectedNodes.length; i++) {
+      // allNodes[allConnectedNodes[i]].color = "pink";
+      allNodes[allConnectedNodes[i]].color = "rgba(150,150,150,0.75)";
+      if (allNodes[allConnectedNodes[i]].hiddenLabel !== undefined) {
+        allNodes[allConnectedNodes[i]].label =
+          allNodes[allConnectedNodes[i]].hiddenLabel;
+        allNodes[allConnectedNodes[i]].hiddenLabel = undefined;
+      }
+    }
+
+    // all first degree nodes get their own color and their label back
+    for (i = 0; i < connectedNodes.length; i++) {
+      // allNodes[connectedNodes[i]].color = undefined;
+      allNodes[connectedNodes[i]].color = nodeColors[connectedNodes[i]];
+      if (allNodes[connectedNodes[i]].hiddenLabel !== undefined) {
+        allNodes[connectedNodes[i]].label =
+          allNodes[connectedNodes[i]].hiddenLabel;
+        allNodes[connectedNodes[i]].hiddenLabel = undefined;
+      }
+    }
+
+    // the main node gets its own color and its label back.
+    // allNodes[selectedNode].color = undefined;
+    allNodes[selectedNode].color = nodeColors[selectedNode];
+    if (allNodes[selectedNode].hiddenLabel !== undefined) {
+      allNodes[selectedNode].label = allNodes[selectedNode].hiddenLabel;
+      allNodes[selectedNode].hiddenLabel = undefined;
+    }
+  } else if (highlightActive === true) {
+    // console.log("highlightActive was true");
+    // reset all nodes
+    for (let nodeId in allNodes) {
+      // allNodes[nodeId].color = "purple";
+      allNodes[nodeId].color = nodeColors[nodeId];
+      // delete allNodes[nodeId].color;
+      if (allNodes[nodeId].hiddenLabel !== undefined) {
+        allNodes[nodeId].label = allNodes[nodeId].hiddenLabel;
+        allNodes[nodeId].hiddenLabel = undefined;
+      }
+    }
+    highlightActive = false;
+  }
+
+  // transform the object into an array
+  var updateArray = [];
+  if (params.nodes.length > 0) {
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        // console.log(allNodes[nodeId]);
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  } else {
+    // console.log("Nothing was selected");
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        // console.log(allNodes[nodeId]);
+        // allNodes[nodeId].color = {};
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  }
+}
+
+function filterHighlight(params) {
+  allNodes = nodes.get({ returnType: "Object" });
+  // if something is selected:
+  if (params.nodes.length > 0) {
+    filterActive = true;
+    let selectedNodes = params.nodes;
+
+    // hiding all nodes and saving the label
+    for (let nodeId in allNodes) {
+      allNodes[nodeId].hidden = true;
+      if (allNodes[nodeId].savedLabel === undefined) {
+        allNodes[nodeId].savedLabel = allNodes[nodeId].label;
+        allNodes[nodeId].label = undefined;
+      }
+    }
+
+    for (let i=0; i < selectedNodes.length; i++) {
+      allNodes[selectedNodes[i]].hidden = false;
+      if (allNodes[selectedNodes[i]].savedLabel !== undefined) {
+        allNodes[selectedNodes[i]].label = allNodes[selectedNodes[i]].savedLabel;
+        allNodes[selectedNodes[i]].savedLabel = undefined;
+      }
+    }
+
+  } else if (filterActive === true) {
+    // reset all nodes
+    for (let nodeId in allNodes) {
+      allNodes[nodeId].hidden = false;
+      if (allNodes[nodeId].savedLabel !== undefined) {
+        allNodes[nodeId].label = allNodes[nodeId].savedLabel;
+        allNodes[nodeId].savedLabel = undefined;
+      }
+    }
+    filterActive = false;
+  }
+
+  // transform the object into an array
+  var updateArray = [];
+  if (params.nodes.length > 0) {
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  } else {
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  }
+}
+
+function selectNode(nodes) {
+  network.selectNodes(nodes);
+  neighbourhoodHighlight({ nodes: nodes });
+  return nodes;
+}
+
+function selectNodes(nodes) {
+  network.selectNodes(nodes);
+  filterHighlight({nodes: nodes});
+  return nodes;
+}
+
+function highlightFilter(filter) {
+  let selectedNodes = []
+  let selectedProp = filter['property']
+  if (filter['item'] === 'node') {
+    let allNodes = nodes.get({ returnType: "Object" });
+    for (let nodeId in allNodes) {
+      if (allNodes[nodeId][selectedProp] && filter['value'].includes((allNodes[nodeId][selectedProp]).toString())) {
+        selectedNodes.push(nodeId)
+      }
+    }
+  }
+  else if (filter['item'] === 'edge'){
+    let allEdges = edges.get({returnType: 'object'});
+    // check if the selected property exists for selected edge and select the nodes connected to the edge
+    for (let edge in allEdges) {
+      if (allEdges[edge][selectedProp] && filter['value'].includes((allEdges[edge][selectedProp]).toString())) {
+        selectedNodes.push(allEdges[edge]['from'])
+        selectedNodes.push(allEdges[edge]['to'])
+      }
+    }
+  }
+  selectNodes(selectedNodes)
+}</script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+            
+            
+            
+            
+            
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tom-select/2.0.0-rc.4/css/tom-select.min.css" integrity="sha512-43fHB3GLgZfz8QXl1RPQ8O66oIgv3po9cJ5erMt1c4QISq9dYb195T3vr5ImnJPXuVroKcGBPXBFKETW8jrPNQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/tom-select/2.0.0-rc.4/js/tom-select.complete.js" integrity="sha512-jeF9CfnvzDiw9G9xiksVjxR2lib44Gnovvkv+3CgCG6NXCD4gqlA5nDAVW5WjpA+i+/zKsUWV5xNEbW1X/HH0Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 800px;
+                 background-color: #ffffff;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+             #config {
+                 float: left;
+                 width: 400px;
+                 height: 600px;
+             }
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+                <div id="select-menu" class="card-header">
+                    <div class="row no-gutters">
+                        <div class="col-10 pb-2">
+                            <select
+                            class="form-select"
+                            aria-label="Default select example"
+                            onchange="selectNode([value]);"
+                            id="select-node"
+                            placeholder="Select node..."
+                            >
+                                <option selected>Select a Node by ID</option>
+                                
+                                    <option value="advantage">advantage</option>
+                                
+                                    <option value="valour and fear">valour and fear</option>
+                                
+                                    <option value="bertram">bertram</option>
+                                
+                                    <option value="counsellor">counsellor</option>
+                                
+                                    <option value="father">father</option>
+                                
+                                    <option value="helena">helena</option>
+                                
+                                    <option value="bertram's">bertram's</option>
+                                
+                                    <option value="imagination">imagination</option>
+                                
+                                    <option value="brooch">brooch</option>
+                                
+                                    <option value="date">date</option>
+                                
+                                    <option value="tooth-pick">tooth-pick</option>
+                                
+                                    <option value="businesses">businesses</option>
+                                
+                                    <option value="courtier">courtier</option>
+                                
+                                    <option value="fistula">fistula</option>
+                                
+                                    <option value="gerard de narbon">gerard de narbon</option>
+                                
+                                    <option value="gerard de narbon's daughter">gerard de narbon's daughter</option>
+                                
+                                    <option value="god">god</option>
+                                
+                                    <option value="heaven">heaven</option>
+                                
+                                    <option value="king">king</option>
+                                
+                                    <option value="lady">lady</option>
+                                
+                                    <option value="lafeu">lafeu</option>
+                                
+                                    <option value="mistress">mistress</option>
+                                
+                                    <option value="mortality">mortality</option>
+                                
+                                    <option value="mother">mother</option>
+                                
+                                    <option value="profession">profession</option>
+                                
+                                    <option value="countess">countess</option>
+                                
+                                    <option value="son">son</option>
+                                
+                                    <option value="court">court</option>
+                                
+                                    <option value="parolles">parolles</option>
+                                
+                                    <option value="cowardice">cowardice</option>
+                                
+                                    <option value="virtue">virtue</option>
+                                
+                                    <option value="credit">credit</option>
+                                
+                                    <option value="cupid">cupid</option>
+                                
+                                    <option value="master">master</option>
+                                
+                                    <option value="pear">pear</option>
+                                
+                                    <option value="phoenix">phoenix</option>
+                                
+                                    <option value="pie">pie</option>
+                                
+                                    <option value="porridge">porridge</option>
+                                
+                                    <option value="virginity">virginity</option>
+                                
+                                    <option value="well">well</option>
+                                
+                                    <option value="death">death</option>
+                                
+                                    <option value="desire">desire</option>
+                                
+                                    <option value="fashion">fashion</option>
+                                
+                                    <option value="folly">folly</option>
+                                
+                                    <option value="wisdom">wisdom</option>
+                                
+                                    <option value="fortune">fortune</option>
+                                
+                                    <option value="love">love</option>
+                                
+                                    <option value="nature">nature</option>
+                                
+                                    <option value="friends">friends</option>
+                                
+                                    <option value="husband">husband</option>
+                                
+                                    <option value="heleena">heleena</option>
+                                
+                                    <option value="highways">highways</option>
+                                
+                                    <option value="honesty">honesty</option>
+                                
+                                    <option value="skill">skill</option>
+                                
+                                    <option value="intents">intents</option>
+                                
+                                    <option value="project">project</option>
+                                
+                                    <option value="majesty">majesty</option>
+                                
+                                    <option value="leisure">leisure</option>
+                                
+                                    <option value="prayers">prayers</option>
+                                
+                                    <option value="eye">eye</option>
+                                
+                                    <option value="merit">merit</option>
+                                
+                                    <option value="man">man</option>
+                                
+                                    <option value="mars">mars</option>
+                                
+                                    <option value="star">star</option>
+                                
+                                    <option value="men">men</option>
+                                
+                                    <option value="virgins">virgins</option>
+                                
+                                    <option value="military policy">military policy</option>
+                                
+                                    <option value="mothers">mothers</option>
+                                
+                                    <option value="pains">pains</option>
+                                
+                                    <option value="sense">sense</option>
+                                
+                                    <option value="queen">queen</option>
+                                
+                                    <option value="physicians">physicians</option>
+                                
+                                    <option value="time">time</option>
+                                
+                                    <option value="poorer born">poorer born</option>
+                                
+                                    <option value="stars">stars</option>
+                                
+                                    <option value="pride">pride</option>
+                                
+                                    <option value="running away">running away</option>
+                                
+                                    <option value="fear">fear</option>
+                                
+                                    <option value="self-love">self-love</option>
+                                
+                                    <option value="valour">valour</option>
+                                
+                                    <option value="what hath been">what hath been</option>
+                                
+                                    <option value="what cannot be">what cannot be</option>
+                                
+                                    <option value="wishing well">wishing well</option>
+                                
+                                    <option value="body">body</option>
+                                
+                            </select>
+                        </div>
+                        <div class="col-2 pb-2">
+                            <button type="button" class="btn btn-primary btn-block" onclick="neighbourhoodHighlight({nodes: []});">Reset Selection</button>
+                        </div>
+                    </div>
+                </div>
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+            <div id="config"></div>
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+                  new TomSelect("#select-node",{
+                      create: false,
+                      sortField: {
+                          field: "text",
+                          direction: "asc"
+                      }
+                  });
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"group": 1, "id": "advantage", "label": "advantage", "shape": "dot", "size": 1}, {"group": 1, "id": "valour and fear", "label": "valour and fear", "shape": "dot", "size": 1}, {"group": 2, "id": "bertram", "label": "bertram", "shape": "dot", "size": 3}, {"group": 2, "id": "counsellor", "label": "counsellor", "shape": "dot", "size": 14}, {"group": 2, "id": "father", "label": "father", "shape": "dot", "size": 3}, {"group": 2, "id": "helena", "label": "helena", "shape": "dot", "size": 20}, {"group": 2, "id": "bertram\u0027s", "label": "bertram\u0027s", "shape": "dot", "size": 2}, {"group": 2, "id": "imagination", "label": "imagination", "shape": "dot", "size": 2}, {"group": 2, "id": "brooch", "label": "brooch", "shape": "dot", "size": 3}, {"group": 2, "id": "date", "label": "date", "shape": "dot", "size": 13}, {"group": 2, "id": "tooth-pick", "label": "tooth-pick", "shape": "dot", "size": 3}, {"group": 4, "id": "businesses", "label": "businesses", "shape": "dot", "size": 1}, {"group": 4, "id": "courtier", "label": "courtier", "shape": "dot", "size": 1}, {"group": 2, "id": "fistula", "label": "fistula", "shape": "dot", "size": 4}, {"group": 2, "id": "gerard de narbon", "label": "gerard de narbon", "shape": "dot", "size": 6}, {"group": 2, "id": "gerard de narbon\u0027s daughter", "label": "gerard de narbon\u0027s daughter", "shape": "dot", "size": 6}, {"group": 2, "id": "god", "label": "god", "shape": "dot", "size": 5}, {"group": 2, "id": "heaven", "label": "heaven", "shape": "dot", "size": 2}, {"group": 2, "id": "king", "label": "king", "shape": "dot", "size": 7}, {"group": 2, "id": "lady", "label": "lady", "shape": "dot", "size": 2}, {"group": 2, "id": "lafeu", "label": "lafeu", "shape": "dot", "size": 1}, {"group": 2, "id": "mistress", "label": "mistress", "shape": "dot", "size": 2}, {"group": 2, "id": "mortality", "label": "mortality", "shape": "dot", "size": 4}, {"group": 2, "id": "mother", "label": "mother", "shape": "dot", "size": 2}, {"group": 2, "id": "profession", "label": "profession", "shape": "dot", "size": 4}, {"group": 5, "id": "countess", "label": "countess", "shape": "dot", "size": 1}, {"group": 5, "id": "son", "label": "son", "shape": "dot", "size": 1}, {"group": 6, "id": "court", "label": "court", "shape": "dot", "size": 1}, {"group": 6, "id": "parolles", "label": "parolles", "shape": "dot", "size": 12}, {"group": 6, "id": "cowardice", "label": "cowardice", "shape": "dot", "size": 2}, {"group": 6, "id": "virtue", "label": "virtue", "shape": "dot", "size": 2}, {"group": 2, "id": "credit", "label": "credit", "shape": "dot", "size": 2}, {"group": 2, "id": "cupid", "label": "cupid", "shape": "dot", "size": 2}, {"group": 2, "id": "master", "label": "master", "shape": "dot", "size": 2}, {"group": 2, "id": "pear", "label": "pear", "shape": "dot", "size": 3}, {"group": 2, "id": "phoenix", "label": "phoenix", "shape": "dot", "size": 2}, {"group": 2, "id": "pie", "label": "pie", "shape": "dot", "size": 2}, {"group": 2, "id": "porridge", "label": "porridge", "shape": "dot", "size": 2}, {"group": 6, "id": "virginity", "label": "virginity", "shape": "dot", "size": 17}, {"group": 2, "id": "well", "label": "well", "shape": "dot", "size": 3}, {"group": 6, "id": "death", "label": "death", "shape": "dot", "size": 1}, {"group": 6, "id": "desire", "label": "desire", "shape": "dot", "size": 1}, {"group": 6, "id": "fashion", "label": "fashion", "shape": "dot", "size": 1}, {"group": 6, "id": "folly", "label": "folly", "shape": "dot", "size": 2}, {"group": 6, "id": "wisdom", "label": "wisdom", "shape": "dot", "size": 2}, {"group": 7, "id": "fortune", "label": "fortune", "shape": "dot", "size": 2}, {"group": 7, "id": "love", "label": "love", "shape": "dot", "size": 4}, {"group": 7, "id": "nature", "label": "nature", "shape": "dot", "size": 3}, {"group": 9, "id": "friends", "label": "friends", "shape": "dot", "size": 1}, {"group": 9, "id": "husband", "label": "husband", "shape": "dot", "size": 1}, {"group": 6, "id": "heleena", "label": "heleena", "shape": "dot", "size": 1}, {"group": 6, "id": "highways", "label": "highways", "shape": "dot", "size": 1}, {"group": 10, "id": "honesty", "label": "honesty", "shape": "dot", "size": 1}, {"group": 10, "id": "skill", "label": "skill", "shape": "dot", "size": 1}, {"group": 11, "id": "intents", "label": "intents", "shape": "dot", "size": 1}, {"group": 11, "id": "project", "label": "project", "shape": "dot", "size": 1}, {"group": 2, "id": "majesty", "label": "majesty", "shape": "dot", "size": 1}, {"group": 12, "id": "leisure", "label": "leisure", "shape": "dot", "size": 1}, {"group": 12, "id": "prayers", "label": "prayers", "shape": "dot", "size": 1}, {"group": 7, "id": "eye", "label": "eye", "shape": "dot", "size": 1}, {"group": 7, "id": "merit", "label": "merit", "shape": "dot", "size": 1}, {"group": 6, "id": "man", "label": "man", "shape": "dot", "size": 2}, {"group": 13, "id": "mars", "label": "mars", "shape": "dot", "size": 1}, {"group": 13, "id": "star", "label": "star", "shape": "dot", "size": 1}, {"group": 6, "id": "men", "label": "men", "shape": "dot", "size": 2}, {"group": 6, "id": "virgins", "label": "virgins", "shape": "dot", "size": 2}, {"group": 6, "id": "military policy", "label": "military policy", "shape": "dot", "size": 2}, {"group": 6, "id": "mothers", "label": "mothers", "shape": "dot", "size": 1}, {"group": 14, "id": "pains", "label": "pains", "shape": "dot", "size": 1}, {"group": 14, "id": "sense", "label": "sense", "shape": "dot", "size": 1}, {"group": 6, "id": "queen", "label": "queen", "shape": "dot", "size": 1}, {"group": 6, "id": "physicians", "label": "physicians", "shape": "dot", "size": 1}, {"group": 6, "id": "time", "label": "time", "shape": "dot", "size": 2}, {"group": 15, "id": "poorer born", "label": "poorer born", "shape": "dot", "size": 1}, {"group": 15, "id": "stars", "label": "stars", "shape": "dot", "size": 1}, {"group": 6, "id": "pride", "label": "pride", "shape": "dot", "size": 1}, {"group": 8, "id": "running away", "label": "running away", "shape": "dot", "size": 1}, {"group": 8, "id": "fear", "label": "fear", "shape": "dot", "size": 2}, {"group": 6, "id": "self-love", "label": "self-love", "shape": "dot", "size": 1}, {"group": 8, "id": "valour", "label": "valour", "shape": "dot", "size": 1}, {"group": 16, "id": "what hath been", "label": "what hath been", "shape": "dot", "size": 1}, {"group": 16, "id": "what cannot be", "label": "what cannot be", "shape": "dot", "size": 1}, {"group": 3, "id": "wishing well", "label": "wishing well", "shape": "dot", "size": 1}, {"group": 3, "id": "body", "label": "body", "shape": "dot", "size": 1}]);
+                  edges = new vis.DataSet([{"from": "advantage", "title": "Parolles\u0027 valour and fear make a composition that provides an advantage.", "to": "valour and fear", "width": 1.0}, {"from": "bertram", "title": "contextual proximity", "to": "counsellor", "width": 0.5}, {"from": "bertram", "title": "contextual proximity", "to": "father", "width": 0.5}, {"from": "bertram", "title": "love and relationship,contextual proximity", "to": "helena", "width": 1.75}, {"from": "bertram\u0027s", "title": "contextual proximity", "to": "helena", "width": 0.5}, {"from": "bertram\u0027s", "title": "carries favor in\u0027t", "to": "imagination", "width": 1.0}, {"from": "brooch", "title": "contextual proximity", "to": "date", "width": 0.5}, {"from": "brooch", "title": "contextual proximity", "to": "helena", "width": 1.0}, {"from": "brooch", "title": "related concepts (complementary or contrasting)", "to": "tooth-pick", "width": 1.0}, {"from": "businesses", "title": "instructs", "to": "courtier", "width": 1.0}, {"from": "counsellor", "title": "contextual proximity", "to": "fistula", "width": 1.0}, {"from": "counsellor", "title": "contextual proximity", "to": "gerard de narbon", "width": 3.0}, {"from": "counsellor", "title": "contextual proximity", "to": "gerard de narbon\u0027s daughter", "width": 2.0}, {"from": "counsellor", "title": "contextual proximity", "to": "god", "width": 0.5}, {"from": "counsellor", "title": "contextual proximity", "to": "heaven", "width": 0.5}, {"from": "counsellor", "title": "contextual proximity", "to": "helena", "width": 0.5}, {"from": "counsellor", "title": "contextual proximity", "to": "king", "width": 2.0}, {"from": "counsellor", "title": "contextual proximity", "to": "lady", "width": 0.5}, {"from": "counsellor", "title": "Lafeu is addressed as a Counsellor,contextual proximity", "to": "lafeu", "width": 1.5}, {"from": "counsellor", "title": "contextual proximity", "to": "mistress", "width": 0.5}, {"from": "counsellor", "title": "contextual proximity", "to": "mortality", "width": 1.0}, {"from": "counsellor", "title": "contextual proximity", "to": "mother", "width": 0.5}, {"from": "counsellor", "title": "contextual proximity", "to": "profession", "width": 1.0}, {"from": "countess", "title": "parent-child relationship", "to": "son", "width": 1.0}, {"from": "court", "title": "Parolles says he will think of Helena at court.", "to": "parolles", "width": 1.0}, {"from": "cowardice", "title": "contextual proximity", "to": "parolles", "width": 0.5}, {"from": "cowardice", "title": "VIRTUE is the opposite of COWARDICE, as stated in the context", "to": "virtue", "width": 1.0}, {"from": "credit", "title": "contextual proximity", "to": "helena", "width": 0.5}, {"from": "credit", "title": "must hold", "to": "father", "width": 1.0}, {"from": "cupid", "title": "contextual proximity", "to": "date", "width": 0.5}, {"from": "cupid", "title": "related concepts (metaphorical),contextual proximity", "to": "helena", "width": 2.0}, {"from": "date", "title": "contextual proximity", "to": "god", "width": 0.5}, {"from": "date", "title": "contextual proximity", "to": "helena", "width": 2.0}, {"from": "date", "title": "contextual proximity", "to": "master", "width": 0.5}, {"from": "date", "title": "contextual proximity", "to": "parolles", "width": 0.5}, {"from": "date", "title": "contextual proximity", "to": "pear", "width": 0.5}, {"from": "date", "title": "contextual proximity", "to": "phoenix", "width": 0.5}, {"from": "date", "title": "contextual proximity", "to": "pie", "width": 0.5}, {"from": "date", "title": "contextual proximity", "to": "porridge", "width": 0.5}, {"from": "date", "title": "contextual proximity", "to": "tooth-pick", "width": 0.5}, {"from": "date", "title": "contextual proximity", "to": "virginity", "width": 0.5}, {"from": "date", "title": "contextual proximity", "to": "well", "width": 0.5}, {"from": "death", "title": "Virgins die if they do not stand for virginity,contextual proximity", "to": "virginity", "width": 2.0}, {"from": "desire", "title": "The state of being a virgin can breed a strong desire or craving, which consumes oneself to the very end.,contextual proximity", "to": "virginity", "width": 2.75}, {"from": "fashion", "title": "contextual proximity", "to": "virginity", "width": 1.75}, {"from": "father", "title": "contextual proximity", "to": "helena", "width": 0.5}, {"from": "fistula", "title": "contextual proximity", "to": "gerard de narbon", "width": 0.75}, {"from": "fistula", "title": "contextual proximity", "to": "gerard de narbon\u0027s daughter", "width": 0.5}, {"from": "fistula", "title": "contextual proximity", "to": "king", "width": 0.5}, {"from": "folly", "title": "contextual proximity", "to": "parolles", "width": 0.5}, {"from": "folly", "title": "WISDOM is waiting on FOLLY, implying that wisdom often fails to prevent folly", "to": "wisdom", "width": 1.0}, {"from": "fortune", "title": "contextual proximity", "to": "love", "width": 0.5}, {"from": "fortune", "title": "contextual proximity", "to": "nature", "width": 0.5}, {"from": "friends", "title": "associated with", "to": "husband", "width": 1.0}, {"from": "gerard de narbon", "title": "contextual proximity", "to": "gerard de narbon\u0027s daughter", "width": 1.5}, {"from": "gerard de narbon", "title": "contextual proximity", "to": "king", "width": 1.5}, {"from": "gerard de narbon", "title": "contextual proximity", "to": "mortality", "width": 0.75}, {"from": "gerard de narbon", "title": "contextual proximity", "to": "profession", "width": 0.75}, {"from": "gerard de narbon\u0027s daughter", "title": "contextual proximity", "to": "king", "width": 1.0}, {"from": "gerard de narbon\u0027s daughter", "title": "contextual proximity", "to": "mortality", "width": 0.5}, {"from": "gerard de narbon\u0027s daughter", "title": "contextual proximity", "to": "profession", "width": 0.5}, {"from": "god", "title": "contextual proximity", "to": "helena", "width": 1.25}, {"from": "god", "title": "related concepts (prayer and blessing)", "to": "well", "width": 1.0}, {"from": "god", "title": "Heaven is considered equivalent to God", "to": "heaven", "width": 1.0}, {"from": "heleena", "title": "contextual proximity", "to": "parolles", "width": 0.5}, {"from": "helena", "title": "contextual proximity", "to": "imagination", "width": 0.5}, {"from": "helena", "title": "HELENA is referred to as a Lady", "to": "lady", "width": 1.0}, {"from": "helena", "title": "contextual proximity", "to": "master", "width": 1.0}, {"from": "helena", "title": "has a relationship with,one-to-one relation (interlocutor),contextual proximity", "to": "parolles", "width": 3.75}, {"from": "helena", "title": "contextual proximity", "to": "pear", "width": 1.0}, {"from": "helena", "title": "contextual proximity", "to": "phoenix", "width": 1.0}, {"from": "helena", "title": "contextual proximity", "to": "pie", "width": 1.0}, {"from": "helena", "title": "contextual proximity", "to": "porridge", "width": 1.0}, {"from": "helena", "title": "contextual proximity", "to": "tooth-pick", "width": 1.0}, {"from": "helena", "title": "contextual proximity", "to": "virginity", "width": 2.75}, {"from": "helena", "title": "contextual proximity", "to": "well", "width": 1.0}, {"from": "highways", "title": "Virgins should be buried in highways,contextual proximity", "to": "virginity", "width": 2.0}, {"from": "honesty", "title": "related concepts", "to": "skill", "width": 1.0}, {"from": "intents", "title": "One\u0027s intents are tied to the success or failure of a project, with a focus on intention and purpose.", "to": "project", "width": 1.0}, {"from": "king", "title": "title relation", "to": "majesty", "width": 1.0}, {"from": "king", "title": "contextual proximity", "to": "mortality", "width": 0.5}, {"from": "king", "title": "contextual proximity", "to": "profession", "width": 0.5}, {"from": "leisure", "title": "related to", "to": "prayers", "width": 1.0}, {"from": "love", "title": "related to", "to": "eye", "width": 1.0}, {"from": "love", "title": "The show of merit may lead to the reception of love.", "to": "merit", "width": 1.0}, {"from": "love", "title": "contextual proximity", "to": "nature", "width": 0.5}, {"from": "man", "title": "contextual proximity", "to": "parolles", "width": 0.5}, {"from": "man", "title": "MAN is enemy to VIRGINITY, as stated in the context", "to": "virginity", "width": 1.0}, {"from": "mars", "title": "Helena thinks that Parolles was born under a charitable star, specifically Mars.", "to": "star", "width": 1.0}, {"from": "men", "title": "contextual proximity", "to": "virginity", "width": 1.0}, {"from": "men", "title": "Virgins are being blown up by men", "to": "virgins", "width": 1.0}, {"from": "military policy", "title": "Parolles is commenting on the military policy", "to": "parolles", "width": 1.0}, {"from": "military policy", "title": "contextual proximity", "to": "virginity", "width": 1.0}, {"from": "mistress", "title": "The Mother is equivalent to the Mistress", "to": "mother", "width": 1.0}, {"from": "mothers", "title": "Speaking on behalf of virginity is accusing one\u0027s mothers,contextual proximity", "to": "virginity", "width": 2.0}, {"from": "nature", "title": "Virginity is against the rule of nature,contextual proximity", "to": "virginity", "width": 2.0}, {"from": "pains", "title": "The weight of pains is measured by one\u0027s sense, with a clear distinction between physical and emotional suffering.", "to": "sense", "width": 1.0}, {"from": "parolles", "title": "contextual proximity", "to": "queen", "width": 0.5}, {"from": "parolles", "title": "contextual proximity", "to": "virginity", "width": 3.5}, {"from": "parolles", "title": "contextual proximity", "to": "virtue", "width": 0.5}, {"from": "parolles", "title": "contextual proximity", "to": "wisdom", "width": 0.5}, {"from": "pear", "title": "related concepts (comparing and contrasting)", "to": "virginity", "width": 1.0}, {"from": "physicians", "title": "treatment-affected entity relationship", "to": "time", "width": 1.0}, {"from": "poorer born", "title": "The poorer born are shut up in wishes by their stars.", "to": "stars", "width": 1.0}, {"from": "pride", "title": "Virginity can be a source of pride, as it is seen as a desirable trait.,contextual proximity", "to": "virginity", "width": 2.75}, {"from": "running away", "title": "Running away is motivated by fear, which proposes safety.", "to": "fear", "width": 1.0}, {"from": "self-love", "title": "The fear of losing one\u0027s virginity can be a manifestation of self-love, as it is seen as a means to maintain control.,contextual proximity", "to": "virginity", "width": 2.75}, {"from": "time", "title": "The longer one keeps their virginity, the less valuable it becomes; time can make it lose its value.,contextual proximity", "to": "virginity", "width": 2.75}, {"from": "valour", "title": "compounds", "to": "fear", "width": 1.0}, {"from": "virginity", "title": "contextual proximity", "to": "virgins", "width": 1.0}, {"from": "what hath been", "title": "The past (what hath been) is distinct from the impossible or unpredictable (what cannot be).", "to": "what cannot be", "width": 1.0}, {"from": "wishing well", "title": "Wishing well is said to have a body in it, which might be felt.", "to": "body", "width": 1.0}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": true,
+        "filter": [
+            "physics"
+        ]
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "forceAtlas2Based": {
+            "avoidOverlap": 0,
+            "centralGravity": 0.015,
+            "damping": 0.4,
+            "gravitationalConstant": -31,
+            "springConstant": 0.08,
+            "springLength": 100
+        },
+        "solver": "forceAtlas2Based",
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+                  // if this network requires displaying the configure window,
+                  // put it in its div
+                  options.configure["container"] = document.getElementById("config");
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+                    network.on("selectNode", neighbourhoodHighlight);
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>

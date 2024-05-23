@@ -1,0 +1,66 @@
+chunk_id;node_1;node_2;edge
+1a28a98bc70847abbeeec89e8fe5ded1;countess;son;parent-child relationship
+1a28a98bc70847abbeeec89e8fe5ded1;bertram;father;son-father relationship
+1a28a98bc70847abbeeec89e8fe5ded1;king;majesty;title relation
+1a28a98bc70847abbeeec89e8fe5ded1;physicians;time;treatment-affected entity relationship
+1a28a98bc70847abbeeec89e8fe5ded1;honesty;skill;related concepts
+17a7c65b68c34337ba9ab549a44374eb;gerard de narbon;profession;had a great skill
+17a7c65b68c34337ba9ab549a44374eb;counsellor;gerard de narbon;was a person with great profession
+17a7c65b68c34337ba9ab549a44374eb;counsellor;king;the king spoke of him admiringly and mourningly
+17a7c65b68c34337ba9ab549a44374eb;gerard de narbon;mortality;was skilled enough to have lived still, if knowledge could be set up against it
+17a7c65b68c34337ba9ab549a44374eb;fistula;king;the king languishes of it
+17a7c65b68c34337ba9ab549a44374eb;counsellor;gerard de narbon's daughter;was left in the Counsellor's care
+17a7c65b68c34337ba9ab549a44374eb;counsellor;gerard de narbon's daughter;has good dispositions and education
+62abff90f72b482ca61e05f42e708f4c;bertram;counsellor;Bertram is addressed as a Counsellor
+62abff90f72b482ca61e05f42e708f4c;lafeu;counsellor;Lafeu is addressed as a Counsellor
+62abff90f72b482ca61e05f42e708f4c;heaven;god;Heaven is considered equivalent to God
+62abff90f72b482ca61e05f42e708f4c;helena;lady;HELENA is referred to as a Lady
+62abff90f72b482ca61e05f42e708f4c;mother;mistress;The Mother is equivalent to the Mistress
+80d4de66f0b94d26a31394503fdb9a34;father;credit;must hold
+80d4de66f0b94d26a31394503fdb9a34;helena;bertram;love and relationship
+80d4de66f0b94d26a31394503fdb9a34;imagination;bertram's;carries favor in't
+80d4de66f0b94d26a31394503fdb9a34;parolles;helena;has a relationship with
+88fbec80095443208571ff78b2a6c58d;parolles;queen;PAROLLES is addressing the QUEEN, in a polite manner
+88fbec80095443208571ff78b2a6c58d;virtue;cowardice;VIRTUE is the opposite of COWARDICE, as stated in the context
+88fbec80095443208571ff78b2a6c58d;virginity;man;MAN is enemy to VIRGINITY, as stated in the context
+88fbec80095443208571ff78b2a6c58d;folly;wisdom;WISDOM is waiting on FOLLY, implying that wisdom often fails to prevent folly
+88fbec80095443208571ff78b2a6c58d;heleena;parolles;HELENA is conversing with PAROLLES, discussing the topic of virginity
+86a8a773f11e4cb9accdc49e9e3a22de;military policy;parolles;Parolles is commenting on the military policy
+86a8a773f11e4cb9accdc49e9e3a22de;virgins;men;Virgins are being blown up by men
+86a8a773f11e4cb9accdc49e9e3a22de;virginity;nature;Virginity is against the rule of nature
+86a8a773f11e4cb9accdc49e9e3a22de;virginity;mothers;Speaking on behalf of virginity is accusing one's mothers
+86a8a773f11e4cb9accdc49e9e3a22de;virginity;death;Virgins die if they do not stand for virginity
+86a8a773f11e4cb9accdc49e9e3a22de;virginity;highways;Virgins should be buried in highways
+78a025d0fc9e47409a867faa18dda4c2;virginity;desire;The state of being a virgin can breed a strong desire or craving, which consumes oneself to the very end.
+78a025d0fc9e47409a867faa18dda4c2;virginity;pride;Virginity can be a source of pride, as it is seen as a desirable trait.
+78a025d0fc9e47409a867faa18dda4c2;virginity;self-love;The fear of losing one's virginity can be a manifestation of self-love, as it is seen as a means to maintain control.
+78a025d0fc9e47409a867faa18dda4c2;virginity;time;"The longer one keeps their virginity, the less valuable it becomes; time can make it lose its value."
+78a025d0fc9e47409a867faa18dda4c2;helena;virginity;Helena is concerned with losing her virginity to her own liking, indicating a desire for control over the situation.
+78a025d0fc9e47409a867faa18dda4c2;parolles;virginity;Parolles advises Helena to lose her virginity quickly, as it will only lose its value over time.
+78a025d0fc9e47409a867faa18dda4c2;fashion;virginity;Just as something that is out of fashion loses its value, virginity can become less desirable over time.
+2e3a868a70254ddfb025e2c7dcf1a032;brooch;tooth-pick;related concepts (complementary or contrasting)
+2e3a868a70254ddfb025e2c7dcf1a032;date;pie;related concepts (implying timing and sustenance)
+2e3a868a70254ddfb025e2c7dcf1a032;date;porridge;related concepts (implying timing and sustenance)
+2e3a868a70254ddfb025e2c7dcf1a032;virginity;pear;related concepts (comparing and contrasting)
+2e3a868a70254ddfb025e2c7dcf1a032;helena;master;one-to-one relation (employer-employee)
+2e3a868a70254ddfb025e2c7dcf1a032;helena;phoenix;related concepts (metaphorical)
+2e3a868a70254ddfb025e2c7dcf1a032;helena;cupid;related concepts (metaphorical)
+2e3a868a70254ddfb025e2c7dcf1a032;parolles;helena;one-to-one relation (interlocutor)
+2e3a868a70254ddfb025e2c7dcf1a032;god;well;related concepts (prayer and blessing)
+2c328c4307c7444bbbc366ec239c712c;wishing well;body;Wishing well is said to have a body in it, which might be felt.
+2c328c4307c7444bbbc366ec239c712c;poorer born;stars;The poorer born are shut up in wishes by their stars.
+2c328c4307c7444bbbc366ec239c712c;mars;star;Helena thinks that Parolles was born under a charitable star, specifically Mars.
+2c328c4307c7444bbbc366ec239c712c;court;parolles;Parolles says he will think of Helena at court.
+2c328c4307c7444bbbc366ec239c712c;advantage;valour and fear;Parolles' valour and fear make a composition that provides an advantage.
+2c328c4307c7444bbbc366ec239c712c;running away;fear;Running away is motivated by fear, which proposes safety.
+d2eafbaba7c844f2a892b618b7e82b6b;valour;fear;compounds
+d2eafbaba7c844f2a892b618b7e82b6b;businesses;courtier;instructs
+d2eafbaba7c844f2a892b618b7e82b6b;leisure;prayers;related to
+d2eafbaba7c844f2a892b618b7e82b6b;friends;husband;associated with
+d2eafbaba7c844f2a892b618b7e82b6b;fortune;nature;influences
+d2eafbaba7c844f2a892b618b7e82b6b;love;eye;related to
+e5eb64f1db4845258120c284269bcb59;love;merit;The show of merit may lead to the reception of love.
+e5eb64f1db4845258120c284269bcb59;fortune;nature;Fortune and nature are intertwined concepts, with fortune being a product of natural forces.
+e5eb64f1db4845258120c284269bcb59;pains;sense;The weight of pains is measured by one's sense, with a clear distinction between physical and emotional suffering.
+e5eb64f1db4845258120c284269bcb59;what hath been;what cannot be;The past (what hath been) is distinct from the impossible or unpredictable (what cannot be).
+e5eb64f1db4845258120c284269bcb59;intents;project;One's intents are tied to the success or failure of a project, with a focus on intention and purpose.

@@ -1,0 +1,9 @@
+langchain
+langchain-core
+langchain-community
+pyvis
+seaborn
+matplotlib
+pandas
+numpy
+networkx
