@@ -174,3 +174,8 @@ The script processes a text document to create a knowledge graph, where nodes re
       - Calls the `visualize_graph(G)` function which:
         - Visualizes the NetworkX graph using PyVis.
         - Saves the visualization as an HTML file.
+
+
+**COLAB NOTEBOOK LINK** :
+
+[KNOWLEDGE_GRAPH_FOR_SHAIKSPHERE](https://colab.research.google.com/drive/10Wha9JfOBHekJ7BTZdofu6gsOijBkqAU?usp=sharing)
